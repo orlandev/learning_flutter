@@ -1,5 +1,7 @@
+import 'package:before_after_image_slider_nullsafty/before_after_image_slider_nullsafty.dart';
 import 'package:flutter/material.dart';
 import 'package:octo_image/octo_image.dart';
+import 'package:panorama/panorama.dart';
 
 void main() {
   runApp(const MyApp());
@@ -36,12 +38,85 @@ class _ImageLoadTestState extends State<ImageLoadTest> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: _buildGrid(),
-        //_buildImageColumn(),
+      body: Container(
+        child: Column(
+          children: [
+            Expanded(flex: 4, child: _buildPanoramic()),
+            Expanded(flex: 2,child: _buildBeforeAfter()),
+            Expanded(flex: 1,child: _buildGrid()),
+          ],
+        ),
+      ),
+      //_buildImageColumn(),
+    );
+  }
+
+  void _showToast(BuildContext context, String text) {
+    final scaffold = ScaffoldMessenger.of(context);
+    scaffold.showSnackBar(
+      SnackBar(
+        content: Text(text),
+        action: SnackBarAction(
+            label: 'CLICKED', onPressed: scaffold.hideCurrentSnackBar),
       ),
     );
   }
+
+  Widget _buildPanoramic() => Container(
+      child: Panorama(
+        interactive: true,
+        sensorControl: SensorControl.AbsoluteOrientation,
+          animSpeed: 0.1,
+          latitude: 21.797201,
+          longitude: -79.981584,
+          hotspots: [
+            Hotspot(
+                width: 200,
+                height: 100,
+                name: "Trinidad",
+                //latitude: 21.797201,
+                //longitude: -79.981584,
+                latitude: 21.801352,
+                longitude: -79.972879,
+                widget: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _showToast(context, "Casa Algo en Trinidad");
+                      });
+                    },
+                    child: Column(
+                      children: const [
+                        Expanded(child: Icon(Icons.info_rounded)),
+                        Expanded(child: Text("Casa Algo en Trinidad"))
+                      ],
+                    ))),
+            Hotspot(
+              width: 200,
+              height: 100,
+
+              name: "Trinidad2",
+              latitude: 15.797201,
+              longitude: -20.981584,
+              //latitude: 21.797387,
+              //longitude: -79.981384
+              widget: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _showToast(context, "Centro de Trinidad");
+                  });
+                },
+                child: Column(
+                  children: const [
+                    Expanded(child: Icon(Icons.info_rounded)),
+                    Expanded(child: Text("Centro de Trinidad "))
+                  ],
+                ),
+              ),
+            ),
+          ],
+          child: Image.network(
+            "https://ik.imagekit.io/6xgh00mrhaz/fixed_a1diPygsA.jpg",
+          )));
 
   Widget _buildImageColumn() => Container(
         decoration: const BoxDecoration(
@@ -87,6 +162,26 @@ class _ImageLoadTestState extends State<ImageLoadTest> {
           }),
         ),
       );
+
+  Widget _buildBeforeAfter() => BeforeAfter(
+      beforeImage: OctoImage(
+        image: const NetworkImage(
+            'https://ik.imagekit.io/6xgh00mrhaz/before_M6xdpfY7N.jpg?updatedAt=1668091406373'),
+        placeholderBuilder: OctoPlaceholder.blurHash(
+          'LEHV6nWB2yk8pyo0adR*.7kCMdnj',
+        ),
+        errorBuilder: OctoError.icon(color: Colors.red),
+        fit: BoxFit.cover,
+      ),
+      afterImage: OctoImage(
+        image: const NetworkImage(
+            'https://ik.imagekit.io/6xgh00mrhaz/after_3uqabisEN.jpg?updatedAt=1668091406394'),
+        placeholderBuilder: OctoPlaceholder.blurHash(
+          'LEHV6nWB2yk8pyo0adR*.7kCMdnj',
+        ),
+        errorBuilder: OctoError.icon(color: Colors.red),
+        fit: BoxFit.cover,
+      ));
 
   Widget _buildGrid() => GridView.extent(
       maxCrossAxisExtent: 150,
